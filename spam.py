@@ -136,10 +136,15 @@ def sendSlackMessage():
         print("Not sending slack message... " + str(minicount) + "/10")
 
 def sendBatchRequests():
-    for _ in range(1000):
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(sendRequest(False))
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    # Create a list of coroutines
+    coroutines = [sendRequest(False) for i in range(100)]
+    loop.run_until_complete(asyncio.gather(*coroutines))
+
+    loop.close()
+
 
 async def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
     """
@@ -169,8 +174,8 @@ async def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
         print("Press CTRL + C to stop")
         for _ in range(4):
             thread = threading.Thread(target=sendBatchRequests, args=())
-            thread.start()
             aliveThreads.append(thread)
+            thread.start()
 
         for aliveThread in aliveThreads:
             aliveThread.join()
