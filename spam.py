@@ -8,6 +8,7 @@ import signal
 import json
 import socks
 import socket
+import os
 
 from faker import Faker
 
@@ -134,6 +135,10 @@ def sendSlackMessage():
         minicount += 1
         print("Not sending slack message... " + str(minicount) + "/10")
 
+def sendBatchRequests():
+    while True:
+        sendRequest(False)
+
 def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
     """
     Sends a specified number of requests or runs in infinite mode, spamming requests indefinitely.
@@ -151,6 +156,7 @@ def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
     if proxy_addresses == []:
         proxy = False
 
+    aliveThreads = []
     if num_requests < 100:
         print("Minimum number of requests is 100")
         print("Setting number of requests to 100")
@@ -159,19 +165,13 @@ def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
         print("Indefinite Mode Activated")
         print("Cooldown between requests: " + str(cooldown) + " seconds")
         print("Press CTRL + C to stop")
-        while True:
-            if stop_flag:
-                break
-            for _ in range(1000):
-                if stop_flag:
-                    break
-                thread = threading.Thread(target=sendRequest, args=(proxy,))
-                thread.start()
-                threads.append(thread)
-                thread.join()
-                time.sleep(cooldown)
-            time.sleep(cooldown2)
-            sendSlackMessage()
+        for _ in range(4):
+            thread = threading.Thread(target=sendBatchRequests)
+            thread.start()
+            aliveThreads.append(thread)
+
+        for aliveThread in aliveThreads:
+            aliveThread.join()
     else:
         print("Spamming " + str(num_requests) + " requests")
         print("Cooldown between requests: " + str(cooldown) + " seconds")
