@@ -165,7 +165,7 @@ def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
         print("Cooldown between requests: " + str(cooldown) + " seconds")
         print("Press CTRL + C to stop")
         for _ in range(4):
-            thread = threading.Thread(target=sendBatchRequests)
+            thread = threading.Thread(target=sendBatchRequests, args=())
             thread.start()
             aliveThreads.append(thread)
 
