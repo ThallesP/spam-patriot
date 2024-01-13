@@ -121,7 +121,7 @@ async def sendRequest(runproxy, loop):
 minicount = 0
 def sendSlackMessage():
     global minicount
-    if minicount == 30:
+    if minicount == 100:
         minicount = 0
         print("Sending slack message...")
         slack_data = {
@@ -133,7 +133,7 @@ def sendSlackMessage():
         print("Sent slack message: " + slack.text)
     else:
         minicount += 1
-        print("Not sending slack message... " + str(minicount) + "/30")
+        print("Not sending slack message... " + str(minicount) + "/100")
 
 def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy, loop):
     """
