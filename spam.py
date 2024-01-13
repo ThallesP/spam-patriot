@@ -87,7 +87,7 @@ def getRandom():
     }
     return random_data
 
-def sendRequest(runproxy):
+async def sendRequest(runproxy):
     """
     Sends a request to the specified URL with a random number appended to it.
     Uses random data obtained from the getRandom() function.
@@ -146,7 +146,7 @@ def sendBatchRequests():
     loop.close()
 
 
-async def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
+def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
     """
     Sends a specified number of requests or runs in infinite mode, spamming requests indefinitely.
 
