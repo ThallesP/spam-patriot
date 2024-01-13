@@ -17,7 +17,7 @@ fake = Faker()
 # pull proxies from file
 
 SOCK5_FILE = 'socks5_proxies.txt'  # Path to the file containing SOCKS5 proxies, one per line (inluding port)
-count = 0
+count = 18533
 
 # ex:
 
@@ -100,7 +100,6 @@ def sendRequest(runproxy):
         socks.set_default_proxy(socks.SOCKS5, proxy['address'], int(proxy['port']))
         socket.socket = socks.socksocket
 
-    count = 18533
     urlwithnum = url + str(random.randint(1000000000000, 9999999999999))
     random_data = getRandom()
     try:
