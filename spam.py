@@ -93,7 +93,7 @@ async def sendRequest(runproxy):
     Uses random data obtained from the getRandom() function.
     Prints the response text received from the server.
     """
-
+    print("running running running")
     global count
     # Set up the SOCKS proxy to route through a public SOCKS5 proxy
     if runproxy:
@@ -135,18 +135,8 @@ def sendSlackMessage():
         minicount += 1
         print("Not sending slack message... " + str(minicount) + "/10")
 
-def sendBatchRequests():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
 
-    # Create a list of coroutines
-    coroutines = [sendRequest(False) for i in range(100)]
-    loop.run_until_complete(asyncio.gather(*coroutines))
-
-    loop.close()
-
-
-def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
+async def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
     """
     Sends a specified number of requests or runs in infinite mode, spamming requests indefinitely.
 
@@ -172,13 +162,15 @@ def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
         print("Indefinite Mode Activated")
         print("Cooldown between requests: " + str(cooldown) + " seconds")
         print("Press CTRL + C to stop")
-        for _ in range(4):
-            thread = threading.Thread(target=sendBatchRequests, args=())
-            aliveThreads.append(thread)
-            thread.start()
+        async with asyncio.TaskGroup() as tg:
+            while True:
+                if stop_flag:
+                    break
+                    
+                for _ in range(100):
+                    tg.create_task(sendRequest(False))
+            time.Sleep(cooldown2)
 
-        for aliveThread in aliveThreads:
-            aliveThread.join()
     else:
         print("Spamming " + str(num_requests) + " requests")
         print("Cooldown between requests: " + str(cooldown) + " seconds")
@@ -212,4 +204,4 @@ if __name__ == "__main__":
     threads = []
     stop_flag = False
     signal.signal(signal.SIGINT, signal_handler)
-    spamRequests(100000, True, 0.05, 1, False)
+    asyncio.run(spamRequests(100000, True, 0.05, 1, False))
