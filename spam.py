@@ -9,6 +9,7 @@ import socks
 import socket
 import os
 import asyncio
+import requests
 import aiohttp
 
 from faker import Faker
