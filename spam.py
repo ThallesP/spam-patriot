@@ -92,13 +92,14 @@ def sendRequest(runproxy):
     Prints the response text received from the server.
     """
 
-    global count = 18533
+    global count
     # Set up the SOCKS proxy to route through a public SOCKS5 proxy
     if runproxy:
         proxy = randomProxy()
         socks.set_default_proxy(socks.SOCKS5, proxy['address'], int(proxy['port']))
         socket.socket = socks.socksocket
 
+    count = 18533
     urlwithnum = url + str(random.randint(1000000000000, 9999999999999))
     random_data = getRandom()
     try:
@@ -177,7 +178,7 @@ def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
         for _ in range(int(num_requests / 100)):
             if stop_flag:
                 break
-            for _ in range(100):
+            for _ in range(1000):
                 if stop_flag:
                     break
                 thread = threading.Thread(target=sendRequest, args=(proxy,))
