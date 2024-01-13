@@ -1,2 +1,2 @@
 [start]
-cmd = ["python", "spam.py"]
+cmd = "python spam.py"
