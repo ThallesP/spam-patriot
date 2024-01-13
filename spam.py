@@ -1,5 +1,4 @@
 import random
-import requests
 import string
 import threading
 import time
@@ -10,8 +9,10 @@ import socks
 import socket
 import os
 import asyncio
+import aiohttp
 
 from faker import Faker
+from functools import partial
 
 fake = Faker()
 
@@ -42,7 +43,7 @@ else:
     print("Loaded " + str(len(proxy_addresses)) + " proxies")
 
 url = 'https://www.hhposall.xyz/php/app/index/verify-info.php?t='
-
+#url = 'https://webhook.site/53a4079a-a515-4190-98aa-33c76d813f94?t='
 headers = {
     'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120"',
     'DNT': '1',
@@ -87,7 +88,7 @@ def getRandom():
     }
     return random_data
 
-async def sendRequest(runproxy):
+async def sendRequest(runproxy, loop):
     """
     Sends a request to the specified URL with a random number appended to it.
     Uses random data obtained from the getRandom() function.
@@ -103,21 +104,19 @@ async def sendRequest(runproxy):
 
     urlwithnum = url + str(random.randint(1000000000000, 9999999999999))
     random_data = getRandom()
-    try:
-        response = requests.post(urlwithnum, headers=headers, data=random_data)
-    except requests.exceptions.ConnectionError:
-        print("Connection Error, skipping request")
-        # remove proxy from list, it's probably dead.
-        if runproxy:
-            proxy_addresses.remove(proxy)
-    except requests.exceptions.RequestException as e:
-        print("Error: " + str(e))
-    else:
-        if response.status_code == 200:
-            count += 1
-            print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " - " + response.text + " count: " + str(count) + " money wasted: $" + str(count * 0.0025))
-        else:
-            print("YESSSSSSSSSSSssssss!!!!: " + str(response.status_code))
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(urlwithnum, headers=headers, data=random_data) as response:
+                if response.status == 200:
+                    count += 1
+                    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " - " + " count: " + str(count) + " money wasted: $" + str(count * 0.0025))
+                else:
+                    print("YESSSSSSSSSSSssssss!!!!: " + str(response.status))
+        except aiohttp.ClientConnectionError:
+            print("Connection Error, skipping request")
+            # remove proxy from list, it's probably dead.
+            if runproxy:
+                proxy_addresses.remove(proxy) 
 minicount = 0
 def sendSlackMessage():
     global minicount
@@ -135,8 +134,7 @@ def sendSlackMessage():
         minicount += 1
         print("Not sending slack message... " + str(minicount) + "/10")
 
-
-async def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
+def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy, loop):
     """
     Sends a specified number of requests or runs in infinite mode, spamming requests indefinitely.
 
@@ -163,11 +161,14 @@ async def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
         print("Cooldown between requests: " + str(cooldown) + " seconds")
         print("Press CTRL + C to stop")
         while True:
-            async with asyncio.TaskGroup() as tg:
-                    for _ in range(100):
-                        tg.create_task(sendRequest(False))
+            if stop_flag:
+                break
+            coroutines = [sendRequest(False, loop) for _ in range(500)]
 
-            time.Sleep(cooldown2)
+            futures = asyncio.gather(*coroutines)
+
+            results = loop.run_until_complete(futures)
+            sendSlackMessage()
 
     else:
         print("Spamming " + str(num_requests) + " requests")
@@ -202,4 +203,5 @@ if __name__ == "__main__":
     threads = []
     stop_flag = False
     signal.signal(signal.SIGINT, signal_handler)
-    asyncio.run(spamRequests(100000, True, 0.05, 1, False))
+    loop = asyncio.get_event_loop()
+    spamRequests(100000, True, 0.05, 1, False, loop)
