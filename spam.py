@@ -205,4 +205,4 @@ if __name__ == "__main__":
     threads = []
     stop_flag = False
     signal.signal(signal.SIGINT, signal_handler)
-    spamRequests(100000, False, 0.05, 5, False)
+    spamRequests(100000, True, 0.05, 1, False)
