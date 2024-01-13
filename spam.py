@@ -133,7 +133,7 @@ def sendSlackMessage():
         print("Sent slack message: " + slack.text)
     else:
         minicount += 1
-        print("Not sending slack message... " + str(minicount) + "/10")
+        print("Not sending slack message... " + str(minicount) + "/30")
 
 def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy, loop):
     """
