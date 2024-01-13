@@ -162,13 +162,11 @@ async def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
         print("Indefinite Mode Activated")
         print("Cooldown between requests: " + str(cooldown) + " seconds")
         print("Press CTRL + C to stop")
-        async with asyncio.TaskGroup() as tg:
-            while True:
-                if stop_flag:
-                    break
-                    
-                for _ in range(100):
-                    tg.create_task(sendRequest(False))
+        while True:
+            async with asyncio.TaskGroup() as tg:
+                    for _ in range(100):
+                        tg.create_task(sendRequest(False))
+
             time.Sleep(cooldown2)
 
     else:
