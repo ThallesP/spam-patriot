@@ -9,6 +9,7 @@ import json
 import socks
 import socket
 import os
+import asyncio
 
 from faker import Faker
 
@@ -135,10 +136,12 @@ def sendSlackMessage():
         print("Not sending slack message... " + str(minicount) + "/10")
 
 def sendBatchRequests():
-    while True:
-        sendRequest(False)
+    for _ in range(1000):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(sendRequest(False))
 
-def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
+async def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy):
     """
     Sends a specified number of requests or runs in infinite mode, spamming requests indefinitely.
 
