@@ -163,11 +163,12 @@ def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy, loop):
         while True:
             if stop_flag:
                 break
-            coroutines = [sendRequest(False, loop) for _ in range(500)]
+            coroutines = [sendRequest(False, loop) for _ in range(10)]
 
             futures = asyncio.gather(*coroutines)
 
             results = loop.run_until_complete(futures)
+            time.sleep(cooldown2)
             sendSlackMessage()
 
     else:
