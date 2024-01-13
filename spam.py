@@ -121,7 +121,7 @@ async def sendRequest(runproxy, loop):
 minicount = 0
 def sendSlackMessage():
     global minicount
-    if minicount == 10:
+    if minicount == 30:
         minicount = 0
         print("Sending slack message...")
         slack_data = {
@@ -164,7 +164,7 @@ def spamRequests(num_requests, infinite, cooldown, cooldown2, proxy, loop):
         while True:
             if stop_flag:
                 break
-            coroutines = [sendRequest(False, loop) for _ in range(10)]
+            coroutines = [sendRequest(False, loop) for _ in range(20)]
 
             futures = asyncio.gather(*coroutines)
 
