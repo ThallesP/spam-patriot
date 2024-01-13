@@ -205,4 +205,4 @@ if __name__ == "__main__":
     stop_flag = False
     signal.signal(signal.SIGINT, signal_handler)
     loop = asyncio.get_event_loop()
-    spamRequests(100000, True, 0.05, 1, False, loop)
+    spamRequests(100000, True, 0.05, 0.1, False, loop)
